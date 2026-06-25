@@ -1,0 +1,47 @@
+{
+    "Header": {
+        "switchLanguage": "AR"
+    },
+
+    "Home": {
+        "heroTitle": "Prepare Your Praise Session",
+        "heroDescription": "Choose your dhikr and target count, and let the app automatically track your recitations using voice recognition."
+    },
+
+    "ZekrSelector": {
+        "title": "Select the dhikr",
+        "description": "Select the dhikr that the AI will listen for"
+    },
+
+    "Counter": {
+        "title": "Select the Number of Repetitions",
+        "description": "How many times would you like to perform this dhikr?",
+        "customPlaceholder": "Enter a custom number...",
+        "unlimited": "Unlimited"
+    },
+
+    "Ringtone": {
+        "title": "Select the Alert Tone",
+        "description": "Choose the sound you'd like to hear when your session is completed"
+    },
+
+    "Privacy": {
+        "title": "Voice Privacy Protection",
+        "description": "All audio processing is done on your device. Audio data is never saved or sent to the cloud.",
+        "microphoneNotice": "In the next step, we will ask for microphone access so the AI can automatically count your praises."
+    },
+
+    "Actions": {
+        "start": "Start Your Dhikr Session"
+    },
+
+    "Session": {
+        "listeningReady": "Ready to Listen",
+        "listeningNow": "Listening...",
+        "changeZekr": "Change Dhikr",
+        "startSession": "Start Session",
+        "pauseSession": "Pause",
+        "restartSession": "Start Again",
+        "note": "The AI performs best in quiet environments. You can recite your dhikr at your own pace."
+    }
+}
