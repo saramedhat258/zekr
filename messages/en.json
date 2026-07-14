@@ -17,6 +17,7 @@
         "title": "Select the Number of Repetitions",
         "description": "How many times would you like to perform this dhikr?",
         "customPlaceholder": "Enter a custom number...",
+        "or":"or",
         "unlimited": "Unlimited"
     },
 
@@ -33,6 +34,10 @@
 
     "Actions": {
         "start": "Start Your Dhikr Session"
+    },
+    "Errors":{
+        "countErr":"The number of repetitions is required",
+        "zekrErr":"Selecting the dhikr is required"
     },
 
     "Session": {

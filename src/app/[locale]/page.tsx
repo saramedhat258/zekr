@@ -1,12 +1,40 @@
-import { useTranslations } from "next-intl";
+"use client";
+import { useLocale, useTranslations } from "next-intl";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
-  const t = useTranslations("Home");
+  const router = useRouter()
+    const locale = useLocale()
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        router.replace(`${locale}/home`)
+      }, 3000);
+      return ()=> clearTimeout(timer)
+    }, [router,locale]) 
 
   return (
-    <div className="p-8 max-w-xl mx-auto space-y-4">
-      <h1 className="text-3xl font-medium">{t("heroTitle")}</h1>
-      <p className="text-gray-600">{t("heroDescription")}</p>
-    </div>
+
+    <div className="relative h-screen bg-main-bg" >
+
+      <Image
+        src="/images/islamicpattern.png"
+        alt="splach"
+        loading="eager"
+        fill
+        
+      />
+      <div className="absolute inset-0 flex items-center justify-center">
+        <Image
+          src="/images/logo.svg"
+          alt="logo"
+          width={200}
+          height={200}
+          className="logo"
+        />
+      </div>
+      
+    </div >
   );
 }

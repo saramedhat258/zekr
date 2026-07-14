@@ -1,24 +1,41 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --dark-green: #095543;
+  --light-green: #b9bf65;
+  --main-bg: #FDFBF7;
+  --main-biege: #f6eac8;
+  --light-blue: #F0F5F8;
+  --zekr-gray: #757575;
+  --light-zekr-gray: #EAEFEF;
 }
 
 @theme {
   --font-arabic: var(--font-arabic);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --dark-green:#095543;
-    --light-green:#B9BF65;
-    --main-bg:#F6EAC8;
-    --light-blue:#B1C8D9;
-    --zekr-gray:#757575
-  }
+  --color-dark-green: var(--dark-green);
+  --color-light-green: var(--light-green);
+  --color-main-bg: var(--main-bg);
+  --color-main-biege: #f6eac8;
+  --color-light-blue: var(--light-blue);
+  --color-zekr-gray: var(--zekr-gray);
+  --color-light-zekr-gray: var(--light-zekr-gray);
 }
 
 body {
   font-family: var(--font-arabic);
+}
+
+/* ///////////////////////////// */
+@keyframes reveal {
+  from {
+    clip-path: inset(0 0 0 100%);
+  }
+
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+.logo {
+  animation: reveal 2s ease forwards;
 }
