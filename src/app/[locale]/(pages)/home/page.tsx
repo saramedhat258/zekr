@@ -1,13 +1,16 @@
 "use client";
+import { useEffect } from 'react';
 import Header from '../../components/Header'
-import Hero from '../../components/Hero';
-import Ringtone from '../../components/Ringtone';
-import Start from '../../components/Start';
-import ZekrCount from '../../components/ZekrCount';
-import ZekrSelctor from '../../components/ZekrSelctor';
+import Hero from '../../components/home/Hero';
+import Ringtone from '../../components/home/Ringtone';
+import Start from '../../components/home/Start';
+import ZekrCount from '../../components/home/ZekrCount';
+import ZekrSelctor from '../../components/home/ZekrSelctor';
 
-function page() {
-    
+function Home() {
+    useEffect(()=>{
+        window.sessionStorage.removeItem("zekr")
+    })
     return (
         <div>
             <Header />
@@ -22,4 +25,4 @@ function page() {
     )
 }
 
-export default page
+export default Home

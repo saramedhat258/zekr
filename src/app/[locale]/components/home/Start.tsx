@@ -1,7 +1,7 @@
 "use client";
 import { useTranslations } from 'next-intl'
 import Image from 'next/image';
-import { useZekr } from '../context/ZekrContext';
+import { useZekr } from '../../context/ZekrContext';
 import { useRouter } from 'next/navigation';
 
 function Start() {

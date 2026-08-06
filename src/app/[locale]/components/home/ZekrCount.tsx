@@ -1,7 +1,7 @@
 "use client";
 import { useTranslations } from 'next-intl'
 import { Dispatch, SetStateAction, useState } from 'react';
-import { useZekr } from '../context/ZekrContext';
+import { useZekr } from '../../context/ZekrContext';
 
 type propTypes = {
     count: number | string,
@@ -13,7 +13,7 @@ function ZekrCountCard({ count, isSelected, setIsSelected }: propTypes) {
     const handleclick = () => {
         setIsSelected(count)
         setCount(Number(count))
-
+        window.sessionStorage.setItem("zekrCount", JSON.stringify(count))
     }
     return (
         <div onClick={handleclick} className={`${isSelected === count ? 'bg-dark-green text-white' : 'bg-white text-zekr-gray'} text-center lg:text-2xl text-lg p-1 px-5 md:p-2 md:px-8 lg:p-3 lg:px-14 rounded-2xl border border-main-biege cursor-pointer`} >{count}</div>
@@ -21,14 +21,18 @@ function ZekrCountCard({ count, isSelected, setIsSelected }: propTypes) {
 }
 
 
-
-
 function ZekrCount() {
     const t = useTranslations("Counter")
     const [isSelected, setIsSelected] = useState<number | string>(-1)
     const zekrCount = [33, 99, 100, 500, t("unlimited")]
-    const { setCount,countErr } = useZekr()
-
+    const { setCount, countErr } = useZekr()
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = Number(e.target.value);
+        setIsSelected(-1);
+        setCount(value);
+        window.sessionStorage.setItem("zekrCount", JSON.stringify(value)
+        );
+    }
     return (
         <div className='my-10'>
             <div className="flex flex-col mt-16 gap-2">
@@ -46,9 +50,9 @@ function ZekrCount() {
                 <hr className='w-full' />
             </div>
             <div>
-                <input type="number" onChange={(e)=>setCount(Number(e.target.value))} name="zekrcount" className='bg-white border text-zekr-gray focus:outline-0 border-main-biege w-full mt-5 p-3 rounded-2xl text-lg' placeholder={t("customPlaceholder")} />
+                <input type="number" onChange={handleChange} name="zekrcount" className='bg-white border text-zekr-gray focus:outline-0 border-main-biege w-full mt-5 p-3 rounded-2xl text-lg' placeholder={t("customPlaceholder")} />
             </div>
-            
+
             {countErr && <div className="text-sm my-3 text-red-600">{countErr}</div>}
         </div>
     )

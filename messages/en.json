@@ -47,6 +47,8 @@
         "startSession": "Start Session",
         "pauseSession": "Pause",
         "restartSession": "Start Again",
-        "note": "The AI performs best in quiet environments. You can recite your dhikr at your own pace."
+        "note": "The AI performs best in quiet environments. You can recite your dhikr at your own pace.",
+        "tooltip":"You can also tap anywhere to count manually"
+
     }
 }

@@ -2,8 +2,8 @@
 import { useTranslations } from "next-intl";
 import ZekrCard from "./ZekrCard";
 import { useState } from "react";
-import { useZekr } from "../context/ZekrContext";
-import { DhikrItem } from "../types";
+import { useZekr } from "../../context/ZekrContext";
+import { DhikrItem } from "../../types";
 
 
 function ZekrSelctor() {

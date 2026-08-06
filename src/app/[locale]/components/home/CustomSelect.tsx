@@ -70,6 +70,7 @@ export default function CustomSelect({
                             key={option.value}
                             onClick={() => {
                                 onChange(option.value);
+                                window.sessionStorage.setItem("ringtone", JSON.stringify(option.value))
                                 setOpen(false);
                             }}
                             className="cursor-pointer px-4 py-3 transition-colors hover:bg-main-bg"

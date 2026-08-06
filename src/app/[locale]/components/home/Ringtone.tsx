@@ -1,16 +1,15 @@
 "use client";
 import { Play } from 'lucide-react';
 import { useTranslations } from 'next-intl'
-import { useZekr } from '../context/ZekrContext';
+import { useZekr } from '../../context/ZekrContext';
 import { useRef } from 'react';
-import CustomSelect from './CustomSelect';
+import CustomSelect from '../home/CustomSelect';
 
 function Ringtone() {
     const t = useTranslations("Ringtone")
     const { setRingtone, ringtone } = useZekr()
 
     const audioRef = useRef<HTMLAudioElement>(null)
-    console.log(ringtone)
     const playAudio = () => {
         if (!audioRef.current) return;
         audioRef.current.load();
