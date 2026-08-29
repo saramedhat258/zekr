@@ -48,7 +48,8 @@
         "pauseSession": "Pause",
         "restartSession": "Start Again",
         "note": "The AI performs best in quiet environments. You can recite your dhikr at your own pace.",
-        "tooltip":"You can also tap anywhere to count manually"
-
+        "tooltip":"You can also tap anywhere to count manually",
+        "speechNotSupported": "Your browser doesn't support speech recognition, you can tap to count manually",
+        "micError": "There was a problem accessing the microphone. Please allow microphone access"
     }
 }
