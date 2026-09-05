@@ -37,7 +37,7 @@ function Session() {
     const { isSupported: speechSupported, error: speechError } = useZekrSpeechRecognition({
         targetPhrase: zekrobj?.arabic || "",
         active: btnState === "started" && start < count,
-        locale: locale === "ar" ? "ar-EG" : "en-US",
+        locale: "ar-EG",
         onMatch: (times) => {
             setStart((prev) => Math.min(count, prev + times));
         },
