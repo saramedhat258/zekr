@@ -20,7 +20,7 @@ function Session() {
     const zekrobj = zekr ? JSON.parse(zekr) : null
     const count = Number(window.sessionStorage.getItem("zekrCount"))
     const ringtone = window.sessionStorage.getItem("ringtone")
-    const ringtoneobj = ringtone ? JSON.parse(ringtone) : null
+    const ringtoneobj = ringtone ? JSON.parse(ringtone) : "/sounds/soft-chime.mp3"
     const audioRef = useRef<HTMLAudioElement>(null)
     useEffect(() => {
         if (!audioRef.current || count !== start) return;
