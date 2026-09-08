@@ -20,18 +20,19 @@ export default function Home() {
 
       <Image
         src="/images/islamicpattern.png"
+        className="opacity-50"
         alt="splach"
         loading="eager"
         fill
         
       />
-      <div className="absolute inset-0 flex items-center justify-center">
+      <div className=" absolute inset-0 flex items-center justify-center">
         <Image
           src="/images/logo.svg"
           alt="logo"
           width={200}
           height={200}
-          className="logo"
+          className="logo sm:w-50 sm:h-50 w-32 h-32"
         />
       </div>
       

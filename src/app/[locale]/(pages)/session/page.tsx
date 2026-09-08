@@ -1,17 +1,15 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 "use client";
 import Image from 'next/image';
-import Header from '../../components/Header'
 import { useTranslations } from 'next-intl'
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import CounterCircle from '../../components/session/CounterCircle';
 import Btn from '../../components/session/Btn';
 import { useZekrSpeechRecognition } from '../../hooks/useZekrSpeechRecognition';
-import { useLocale } from 'next-intl';
 
 function Session() {
     const t = useTranslations("Session")
-    const locale = useLocale()
     const [start, setStart] = useState(0)
     const [btnState, setBtnState] = useState("")
     const router = useRouter()
@@ -22,10 +20,12 @@ function Session() {
     const ringtone = window.sessionStorage.getItem("ringtone")
     const ringtoneobj = ringtone ? JSON.parse(ringtone) : "/sounds/soft-chime.mp3"
     const audioRef = useRef<HTMLAudioElement>(null)
+    
     useEffect(() => {
         if (!audioRef.current || count !== start) return;
         audioRef.current.load();
         audioRef.current?.play()
+        
     })
 
     const increase = () => {
@@ -45,7 +45,6 @@ function Session() {
 
     return (
         <div >
-            <Header />
             <div className='mt-5' onClick={increase}>
                 <div className='w-fit m-auto flex gap-2 px-5 p-2 font-light rounded-3xl text-[#786F59] bg-[#FAF4E3]'>
                     <Image src={btnState === "started" ? "/images/audio-wave.svg" : "/images/micgray.svg"} alt="mic" width={15} height={15} />
@@ -58,14 +57,14 @@ function Session() {
                     <p className='text-center text-sm text-red-500 mt-2'>{t("micError")}</p>
                 )}
                 <CounterCircle start={start} count={count} setStart={setStart} setBtnState={setBtnState} />
-                <div className='flex flex-col gap-1 items-center p-5 mt-10'>
-                    <p className=' text-5xl mb-2 font-bold'>{zekrobj.arabic}</p>
+                <div className='flex flex-col gap-1 text-center items-center p-5 sm:mt-10 mt-3'>
+                    <p className=' sm:text-5xl text-4xl mb-2 font-bold'>{zekrobj.arabic}</p>
                     <p className='text-zekr-gray'>{zekrobj.transliteration}</p>
-                    <p className='text-2xl font-medium text-zekr-gray'>{zekrobj.translation}</p>
+                    <p className='sm:text-2xl text-xl font-medium text-zekr-gray'>{zekrobj.translation}</p>
                 </div>
             </div>
             {/* buttons /////////////////////////////////////////////////////////////////////////////////////////////// */}
-            <div className='flex flex-col md:flex-row gap-5 sm:w-1/2 m-auto'>
+            <div className='flex flex-col md:flex-row sm:gap-5 gap-2 lg:w-1/2 sm:w-3/4 m-auto'>
                 {btnState === "started" && start !== count ?
                     <Btn src='/images/pause.svg' alt='pause' text={t("pauseSession")} onClick={() => setBtnState("start")} />
                     : start === count ?

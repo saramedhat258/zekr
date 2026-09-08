@@ -9,12 +9,12 @@ type propTypes = {
     isSelected: number | null
 }
 
-function ZekrCard({ dhikr, isSelected, setIsSelected}: propTypes) {
-    const {setZekr}=useZekr()
+function ZekrCard({ dhikr, isSelected, setIsSelected }: propTypes) {
+    const { setZekr } = useZekr()
     const handleclick = () => {
         setIsSelected(dhikr.id)
         setZekr({ id: dhikr.id, arabic: dhikr.arabic, translation: dhikr.translation, transliteration: dhikr.transliteration })
-        window.sessionStorage.setItem("zekr",JSON.stringify(dhikr))
+        window.sessionStorage.setItem("zekr", JSON.stringify(dhikr))
     }
     return (
         <div onClick={handleclick} className={`border ${isSelected === dhikr.id ? 'border-dark-green' : 'border-main-biege'} cursor-pointer rounded-xl text-center lg:w-[30%] w-full p-5 bg-white`}>

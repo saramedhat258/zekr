@@ -19,7 +19,7 @@ function Ringtone() {
         <div className='my-10'>
             <audio ref={audioRef} src={ringtone} preload="auto" />
             <div className="flex flex-col mt-16 gap-2">
-                <p className="text-2xl font-medium">3. {t("title")}</p>
+                <p className="sm:text-2xl text-xl font-medium">3. {t("title")}</p>
                 <p className="text-[16px] text-zekr-gray">{t("description")}</p>
             </div>
             <div className='flex gap-2 mt-8'>

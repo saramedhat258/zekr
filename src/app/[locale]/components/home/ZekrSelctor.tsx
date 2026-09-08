@@ -22,7 +22,7 @@ function ZekrSelctor() {
     return (
         <div >
             <div className="flex flex-col mt-16 gap-2">
-                <p className="text-2xl font-medium">1. {t("title")}</p>
+                <p className="sm:text-2xl text-xl font-medium">1. {t("title")}</p>
                 <p className="text-[16px] text-zekr-gray">{t("description")}</p>
             </div>
             {/* zekr */}

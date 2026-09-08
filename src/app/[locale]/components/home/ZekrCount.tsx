@@ -16,27 +16,38 @@ function ZekrCountCard({ count, isSelected, setIsSelected }: propTypes) {
         window.sessionStorage.setItem("zekrCount", JSON.stringify(count))
     }
     return (
-        <div onClick={handleclick} className={`${isSelected === count ? 'bg-dark-green text-white' : 'bg-white text-zekr-gray'} text-center lg:text-2xl text-lg p-1 px-5 md:p-2 md:px-8 lg:p-3 lg:px-14 rounded-2xl border border-main-biege cursor-pointer`} >{count}</div>
+        <div onClick={handleclick} className={`${isSelected === count ? 'bg-dark-green text-white' : 'bg-white text-zekr-gray'} text-center lg:text-xl text-lg p-1 px-5 md:p-2 md:px-8 lg:p-3 lg:px-14 rounded-2xl border border-main-biege cursor-pointer`} >{count}</div>
     )
 }
 
-
+//todo: not allow zero or negative values تم
 function ZekrCount() {
     const t = useTranslations("Counter")
     const [isSelected, setIsSelected] = useState<number | string>(-1)
     const zekrCount = [33, 99, 100, 500, t("unlimited")]
     const { setCount, countErr } = useZekr()
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = Number(e.target.value);
+        const value = e.target.value;
+        if (value === "") {
+            setIsSelected(-1);
+            return;
+        }
+        const numberValue = Number(value);
+        if (numberValue === 0) {
+            return;
+        }
         setIsSelected(-1);
-        setCount(value);
-        window.sessionStorage.setItem("zekrCount", JSON.stringify(value)
+        setCount(numberValue);
+        window.sessionStorage.setItem(
+            "zekrCount",
+            JSON.stringify(numberValue)
         );
-    }
+    };
+
     return (
         <div className='my-10'>
             <div className="flex flex-col mt-16 gap-2">
-                <p className="text-2xl font-medium">2. {t("title")}</p>
+                <p className="sm:text-2xl text-xl font-medium">2. {t("title")}</p>
                 <p className="text-[16px] text-zekr-gray">{t("description")}</p>
             </div>
             <div className='my-8 flex flex-wrap justify-between gap-2'>
@@ -50,7 +61,13 @@ function ZekrCount() {
                 <hr className='w-full' />
             </div>
             <div>
-                <input type="number" onChange={handleChange} name="zekrcount" className='bg-white border text-zekr-gray focus:outline-0 border-main-biege w-full mt-5 p-3 rounded-2xl text-lg' placeholder={t("customPlaceholder")} />
+                <input type="number" 
+                onKeyDown={(e) => {if (e.key === "-") e.preventDefault()}} 
+                min={1} 
+                onChange={handleChange} 
+                name="zekrcount" 
+                className='bg-white border text-zekr-gray focus:outline-0 border-main-biege w-full mt-5 p-3 rounded-2xl sm:placeholder:text-lg ' 
+                placeholder={t("customPlaceholder")} />
             </div>
 
             {countErr && <div className="text-sm my-3 text-red-600">{countErr}</div>}

@@ -1,6 +1,6 @@
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 
 type prop = {
     start: number,
@@ -9,12 +9,21 @@ type prop = {
     setBtnState: Dispatch<SetStateAction<string>>
 }
 
-function CounterCircle({ start, count, setStart,setBtnState }: prop) {
+
+function CounterCircle({ start, count, setStart, setBtnState }: prop) {
     const t = useTranslations("Session")
     const [showTooltip, setShowTooltip] = useState(false);
     const progress = (start / count) * 100;
-    const radius = 160;
     const stroke = 12;
+    const [radius, setRadius] = useState(160);
+    useEffect(() => {
+        const handleResize = () => {
+            setRadius(window.innerWidth <= 400 ? 145 : 160);
+        };
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
     const normalizedRadius = radius - stroke / 2;
     const circumference = normalizedRadius * 2 * Math.PI;
     const strokeDashoffset = circumference - (progress / 100) * circumference;
@@ -23,7 +32,7 @@ function CounterCircle({ start, count, setStart,setBtnState }: prop) {
             <div className='flex flex-col group relative'>
                 <button
                     type="button"
-                    onClick={(e) =>{e.stopPropagation(); setShowTooltip((prev) => !prev)}}
+                    onClick={(e) => { e.stopPropagation(); setShowTooltip((prev) => !prev) }}
                     className="cursor-pointer"
                 >
                     <Image
@@ -37,9 +46,9 @@ function CounterCircle({ start, count, setStart,setBtnState }: prop) {
                     absolute text-center text-sm sm:-right-26 z-20 top-8  w-3/4 bg-white rounded-2xl p-5 group-hover:block  shadow-lg
                     transition-all duration-200
                     ${showTooltip
-                                        ? "opacity-100 visible"
-                                        : "opacity-0 invisible group-hover:opacity-100 group-hover:visible"
-                                    }
+                        ? "opacity-100 visible"
+                        : "opacity-0 invisible group-hover:opacity-100 group-hover:visible"
+                    }
                     `}>{t("tooltip")}</p>
             </div>
 

@@ -1,22 +1,30 @@
 "use client";
 import { useEffect } from 'react';
-import Header from '../../components/Header'
 import Hero from '../../components/home/Hero';
 import Ringtone from '../../components/home/Ringtone';
 import Start from '../../components/home/Start';
 import ZekrCount from '../../components/home/ZekrCount';
 import ZekrSelctor from '../../components/home/ZekrSelctor';
+import { useZekr } from '../../context/ZekrContext';
 
 function Home() {
-    useEffect(()=>{
-        window.sessionStorage.removeItem("zekr")
-    })
+    const { setCount,setZekr } = useZekr()
+    useEffect(() => {
+        window.sessionStorage.clear();
+        setCount(0)
+        setZekr({
+            id: 0,
+            arabic: '',
+            transliteration: '',
+            translation: ''
+        })
+    }, [setCount,setZekr]);
+
     return (
         <div>
-            <Header />
-            <main className='w-3/4 m-auto'>
-                <Hero/>
-                <ZekrSelctor/>
+            <main className='sm:w-3/4 w-full m-auto'>
+                <Hero />
+                <ZekrSelctor />
                 <ZekrCount />
                 <Ringtone />
                 <Start />
