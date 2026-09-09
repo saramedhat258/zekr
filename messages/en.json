@@ -50,6 +50,15 @@
         "note": "The AI performs best in quiet environments. You can recite your dhikr at your own pace.",
         "tooltip":"You can also tap anywhere to count manually",
         "speechNotSupported": "Your browser doesn't support speech recognition, you can tap to count manually",
-        "micError": "There was a problem accessing the microphone. Please allow microphone access"
+        "micError": "There was a problem accessing the microphone. Please allow microphone access",
+        "offlineAiNotice": "You are offline. AI voice recognition requires an internet connection, you can count manually by tapping."
+    },
+
+    "PWA": {
+        "title": "Install Zekr App",
+        "description": "Install the app on your device for quick access and offline dhikr recitations anytime",
+        "installBtn": "Download App",
+        "dismiss": "Dismiss",
+        "iosInstruction": "To install on iPhone: tap the Share button and select 'Add to Home Screen'"
     }
 }

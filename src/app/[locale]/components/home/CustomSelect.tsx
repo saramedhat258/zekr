@@ -64,7 +64,7 @@ export default function CustomSelect({
             </button>
 
             {open && (
-                <ul className="absolute z-50 mt-2 w-full rounded-2xl border border-main-biege bg-white shadow-lg overflow-hidden sm:text-xl text-sm">
+                <ul className="absolute z-50 mt-2 w-full rounded-2xl border border-main-biege bg-white shadow-lg overflow-hidden sm:text-lg text-sm">
                     {options.map((option) => (
                         <li
                             key={option.value}

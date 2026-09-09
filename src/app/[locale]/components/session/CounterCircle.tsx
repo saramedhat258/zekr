@@ -6,11 +6,12 @@ type prop = {
     start: number,
     count: number,
     setStart: Dispatch<SetStateAction<number>>,
-    setBtnState: Dispatch<SetStateAction<string>>
+    setBtnState: Dispatch<SetStateAction<string>>,
+    isoffline: boolean
 }
 
 
-function CounterCircle({ start, count, setStart, setBtnState }: prop) {
+function CounterCircle({ start, count, setStart, setBtnState, isoffline }: prop) {
     const t = useTranslations("Session")
     const [showTooltip, setShowTooltip] = useState(false);
     const progress = (start / count) * 100;
@@ -30,18 +31,20 @@ function CounterCircle({ start, count, setStart, setBtnState }: prop) {
     return (
         <div className='w-fit m-auto' >
             <div className='flex flex-col group relative'>
-                <button
-                    type="button"
-                    onClick={(e) => { e.stopPropagation(); setShowTooltip((prev) => !prev) }}
-                    className="cursor-pointer"
-                >
-                    <Image
-                        src="/images/tooltip.svg"
-                        alt="tooltip"
-                        width={20}
-                        height={20}
-                    />
-                </button>
+                {!isoffline &&
+                    <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); setShowTooltip((prev) => !prev) }}
+                        className="cursor-pointer"
+                    >
+                        <Image
+                            src="/images/tooltip.svg"
+                            alt="tooltip"
+                            width={20}
+                            height={20}
+                        />
+                    </button>
+                }
                 <p className={`
                     absolute text-center text-sm sm:-right-26 z-20 top-8  w-3/4 bg-white rounded-2xl p-5 group-hover:block  shadow-lg
                     transition-all duration-200
@@ -53,7 +56,7 @@ function CounterCircle({ start, count, setStart, setBtnState }: prop) {
             </div>
 
 
-            <div className="mt-10 m-auto relative flex items-center justify-center w-70 h-70">
+            <div className="mt-5 m-auto relative flex items-center justify-center w-70 h-70">
                 <svg
                     className="absolute -rotate-90"
                     width={radius * 2}
