@@ -2,7 +2,7 @@
 import { useTranslations } from 'next-intl'
 import Image from 'next/image';
 import { useZekr } from '../../context/ZekrContext';
-import { useRouter } from 'next/navigation';
+import { useRouter } from '@/i18n/navigation';
 
 function Start() {
     const t = useTranslations("Privacy")

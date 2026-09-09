@@ -1,18 +1,17 @@
 "use client";
 import { useLocale, useTranslations } from "next-intl";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useEffect } from "react";
 
 export default function Home() {
   const router = useRouter()
-    const locale = useLocale()
     useEffect(() => {
       const timer = setTimeout(() => {
-        router.replace(`${locale}/home`)
+        router.replace('/home')
       }, 3000);
       return ()=> clearTimeout(timer)
-    }, [router,locale]) 
+    }, [router]) 
 
   return (
 

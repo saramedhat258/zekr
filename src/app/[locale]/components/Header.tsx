@@ -1,11 +1,11 @@
 import Image from 'next/image'
 import LanguageSwitcher from './LanguageSwitcher'
-import Link from 'next/link'
+import { Link } from '@/i18n/navigation'
 
 function Header() {
     return (
         <header className=' h-20 flex justify-between align-middle items-center'>
-            <Link href={`/home`}>
+            <Link href="/home">
                 <Image
                     src='/images/logo.svg'
                     alt='logo'
