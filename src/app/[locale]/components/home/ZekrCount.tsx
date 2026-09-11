@@ -9,11 +9,18 @@ type propTypes = {
     isSelected: number | string
 }
 function ZekrCountCard({ count, isSelected, setIsSelected }: propTypes) {
+    const t = useTranslations("Counter")
     const { setCount } = useZekr()
     const handleclick = () => {
         setIsSelected(count)
-        setCount(Number(count))
-        window.sessionStorage.setItem("zekrCount", JSON.stringify(count))
+        const isUnlimited = count === t("unlimited")
+        if (isUnlimited) {
+            setCount(Infinity)
+            window.sessionStorage.setItem("zekrCount", "unlimited")
+        } else {
+            setCount(Number(count))
+            window.sessionStorage.setItem("zekrCount", JSON.stringify(count))
+        }
     }
     return (
         <div onClick={handleclick} className={`${isSelected === count ? 'bg-dark-green text-white' : 'bg-white text-zekr-gray'} text-center lg:text-xl text-lg p-1 px-5 md:p-2 md:px-8 lg:p-3 lg:px-14 rounded-2xl border border-main-biege cursor-pointer`} >{count}</div>
@@ -62,7 +69,7 @@ function ZekrCount() {
             </div>
             <div>
                 <input type="number" 
-                onKeyDown={(e) => {if (e.key === "-") e.preventDefault()}} 
+                onKeyDown={(e) => {if (e.key === "-" || e.key === "+" || e.key === "e" || e.key === "E" || e.key === ".") e.preventDefault()}} 
                 min={1} 
                 onChange={handleChange} 
                 name="zekrcount" 

@@ -3,11 +3,11 @@
 :root {
   --dark-green: #095543;
   --light-green: #b9bf65;
-  --main-bg: #FDFBF7;
+  --main-bg: #fdfbf7;
   --main-biege: #f6eac8;
-  --light-blue: #F0F5F8;
+  --light-blue: #f0f5f8;
   --zekr-gray: #757575;
-  --light-zekr-gray: #EAEFEF;
+  --light-zekr-gray: #eaefef;
 }
 
 @theme {
@@ -25,6 +25,35 @@ body {
   font-family: var(--font-arabic);
 }
 
+html,
+body,
+body * {
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
+/* Inputs should still allow typing/editing */
+input,
+textarea,
+[contenteditable="true"] {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  user-select: text !important;
+}
+
+/* Prevent dragging images */
+img {
+  -webkit-user-drag: none;
+}
+
+/* Hide text selection */
+::selection {
+  background: transparent;
+  color: inherit;
+}
+
 /* ///////////////////////////// */
 @keyframes reveal {
   from {
@@ -38,4 +67,35 @@ body {
 
 .logo {
   animation: reveal 2s ease forwards;
+}
+
+/* Unlimited mode — idle: no green arc, only the beige background ring shows */
+.spin-arc-idle {
+  stroke-dasharray: 0 100;
+  stroke-dashoffset: 0;
+}
+
+/* Unlimited mode — per-dhikr: green arc appears, sweeps, and vanishes */
+/* pathLength=100 means dashoffset -100 = exactly one full rotation = same visual as 0 → seamless snap back to idle */
+.spin-arc-animate {
+  animation: spin-arc-pulse 0.75s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes spin-arc-pulse {
+  0% {
+    stroke-dasharray: 0 100;
+    stroke-dashoffset: 0;
+  }
+  30% {
+    stroke-dasharray: 60 40;
+    stroke-dashoffset: -20;
+  }
+  70% {
+    stroke-dasharray: 60 40;
+    stroke-dashoffset: -65;
+  }
+  100% {
+    stroke-dasharray: 0 100;
+    stroke-dashoffset: -100;
+  }
 }

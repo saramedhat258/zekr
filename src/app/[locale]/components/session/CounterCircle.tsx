@@ -1,6 +1,6 @@
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 
 type prop = {
     start: number,
@@ -14,9 +14,21 @@ type prop = {
 function CounterCircle({ start, count, setStart, setBtnState, isoffline }: prop) {
     const t = useTranslations("Session")
     const [showTooltip, setShowTooltip] = useState(false);
-    const progress = (start / count) * 100;
+    const isUnlimited = count === Infinity;
+    const progress = isUnlimited ? 0 : (start / count) * 100;
     const stroke = 12;
     const [radius, setRadius] = useState(160);
+
+    // Tracks which dhikr count triggered the current animation.
+    // Changing this key remounts the SVG circle, restarting the one-shot animation.
+    const [animKey, setAnimKey] = useState(0);
+    const prevStartRef = useRef(start);
+    useEffect(() => {
+        if (isUnlimited && start > prevStartRef.current) {
+            setAnimKey(k => k + 1);
+        }
+        prevStartRef.current = start;
+    }, [start, isUnlimited]);
     useEffect(() => {
         const handleResize = () => {
             setRadius(window.innerWidth <= 400 ? 145 : 160);
@@ -72,29 +84,50 @@ function CounterCircle({ start, count, setStart, setBtnState, isoffline }: prop)
                         strokeWidth={stroke}
                     />
 
-                    {/* Progress */}
-                    <circle
-                        cx={radius}
-                        cy={radius}
-                        r={normalizedRadius}
-                        fill="transparent"
-                        stroke="#095543"
-                        strokeWidth={stroke}
-                        strokeLinecap="round"
-                        strokeDasharray={circumference}
-                        strokeDashoffset={strokeDashoffset}
-                        className="transition-all duration-500"
-                    />
+                    {/* Progress or Unlimited spinning arc */}
+                    {isUnlimited ? (
+                        animKey > 0 && (
+                            <circle
+                                key={animKey}
+                                cx={radius}
+                                cy={radius}
+                                r={normalizedRadius}
+                                fill="transparent"
+                                stroke="#095543"
+                                strokeWidth={stroke}
+                                strokeLinecap="round"
+                                pathLength={100}
+                                className="spin-arc-animate"
+                            />
+                        )
+                    ) : (
+                        <circle
+                            cx={radius}
+                            cy={radius}
+                            r={normalizedRadius}
+                            fill="transparent"
+                            stroke="#095543"
+                            strokeWidth={stroke}
+                            strokeLinecap="round"
+                            strokeDasharray={circumference}
+                            strokeDashoffset={strokeDashoffset}
+                            className="transition-all duration-500"
+                        />
+                    )}
                 </svg>
 
                 <div className="text-center">
                     <p className="text-8xl font-bold text-dark-green">
                         {start}
                     </p>
-                    <hr className="my-3 border-light-green" />
-                    <p className="text-3xl text-light-green">
-                        {count}
-                    </p>
+                    {!isUnlimited && (
+                        <>
+                            <hr className="my-3 border-light-green" />
+                            <p className="text-3xl text-light-green">
+                                {count}
+                            </p>
+                        </>
+                    )}
                 </div>
             </div>
             <div className='cursor-pointer' onClick={(e) => {

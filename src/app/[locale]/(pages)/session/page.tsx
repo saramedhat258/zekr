@@ -34,7 +34,8 @@ function Session() {
 
             const zekr = window.sessionStorage.getItem("zekr");
             const parsedZekr = zekr ? JSON.parse(zekr) : null;
-            const zekrCount = Number(window.sessionStorage.getItem("zekrCount")) || 33;
+            const zekrCountRaw = window.sessionStorage.getItem("zekrCount");
+            const zekrCount = zekrCountRaw === "unlimited" ? Infinity : (Number(zekrCountRaw) || 33);
             const ringtone = window.sessionStorage.getItem("ringtone");
             const parsedRingtone = ringtone ? JSON.parse(ringtone) : "/sounds/soft-chime.mp3";
 
@@ -56,22 +57,22 @@ function Session() {
     }, [router]);
 
     useEffect(() => {
-        if (!audioRef.current || start === 0 || count !== start) return;
+        if (!audioRef.current || start === 0 || count === Infinity || count !== start) return;
         audioRef.current.load();
         audioRef.current?.play();
     }, [start, count]);
 
     const increase = () => {
-        count !== start && setStart(start + 1);
+        if (count === Infinity || count !== start) setStart(start + 1);
     };
 
     // Voice counting: while btnState === "started" and online, listen to mic
     const { isSupported: speechSupported, error: speechError } = useZekrSpeechRecognition({
         targetPhrase: zekrobj?.arabic || "",
-        active: btnState === "started" && start < count && !isOffline,
+        active: btnState === "started" && (count === Infinity || start < count) && !isOffline,
         locale: "ar-EG",
         onMatch: (times) => {
-            setStart((prev) => Math.min(count, prev + times));
+            setStart((prev) => count === Infinity ? prev + times : Math.min(count, prev + times));
         },
     });
 
