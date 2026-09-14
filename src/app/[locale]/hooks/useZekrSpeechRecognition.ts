@@ -74,6 +74,13 @@ const MIN_RESTART_DELAY_MS = 250;
 const MAX_RESTART_DELAY_MS = 3000;
 const CONFIRM_DELAY_MS = 150;
 const MIN_CONFIDENCE = 0.55;
+// A single recognizer result should never plausibly represent more than a
+// handful of repetitions said in one breath. Chrome occasionally has a bug
+// where a "final" result comes back with the phrase duplicated internally
+// (e.g. reporting 16 matches when the user only said it 3 times). Capping
+// how much a single event can add protects against that glitch without
+// needing to know its exact cause.
+const MAX_MATCHES_PER_EVENT = 4;
 
 export function useZekrSpeechRecognition({
   targetPhrase,
@@ -83,13 +90,17 @@ export function useZekrSpeechRecognition({
 }: UseZekrSpeechRecognitionArgs) {
   const [isSupported, setIsSupported] = useState(true);
   const [error, setError] = useState<string>("");
-  // TEMPORARY DEBUG FIELDS — remove once the Android issue is diagnosed.
+  // TEMPORARY DEBUG FIELDS — remove once the counting issue is fully resolved.
   const [lastHeard, setLastHeard] = useState<string>("");
   const [lastConfidence, setLastConfidence] = useState<number | null>(null);
 
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const targetRef = useRef(normalizeArabic(targetPhrase));
 
+  // These are intentionally NOT reset on every automatic restart (only when
+  // the whole listening session is stopped/started by the user) — a natural
+  // pause that causes the browser to end and restart the recognizer should
+  // not erase progress the user has already made toward saying the phrase.
   const finalizedTextRef = useRef("");
   const confirmedCountRef = useRef(0);
   const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -113,6 +124,12 @@ export function useZekrSpeechRecognition({
     recognitionRef.current?.stop();
   }, []);
 
+  const commitMatch = (times: number) => {
+    // Never let a single burst add more than a sane number of repetitions.
+    const clamped = Math.min(times, MAX_MATCHES_PER_EVENT);
+    onMatch(clamped);
+  };
+
   useEffect(() => {
     const SpeechRecognitionImpl =
       typeof window !== "undefined"
@@ -135,12 +152,14 @@ export function useZekrSpeechRecognition({
     let stopped = false;
     backoffRef.current = MIN_RESTART_DELAY_MS;
 
+    // Reset progress ONCE per activation (user pressing "start"), not on
+    // every automatic restart — see the comment on the refs above.
+    finalizedTextRef.current = "";
+    confirmedCountRef.current = 0;
+    clearPendingTimer();
+
     const createAndStart = () => {
       if (stopped) return;
-
-      finalizedTextRef.current = "";
-      confirmedCountRef.current = 0;
-      clearPendingTimer();
 
       const recognition = new SpeechRecognitionImpl();
       recognition.lang = locale;
@@ -157,8 +176,7 @@ export function useZekrSpeechRecognition({
           const alt = result[0];
 
           // TEMPORARY DEBUG — show exactly what the engine heard + its
-          // confidence, live on screen, regardless of whether it passes
-          // the filter below.
+          // confidence, live on screen.
           setLastHeard(alt.transcript);
           setLastConfidence(
             typeof alt.confidence === "number" ? alt.confidence : null
@@ -179,7 +197,10 @@ export function useZekrSpeechRecognition({
             clearPendingTimer();
             const total = countOccurrences(finalizedTextRef.current, targetRef.current);
             if (total > confirmedCountRef.current) {
-              onMatch(total - confirmedCountRef.current);
+              const delta = total - confirmedCountRef.current;
+              commitMatch(delta);
+              // Even if we clamped what we reported, treat the full total as
+              // "seen" so we don't re-report the clamped-off remainder later.
               confirmedCountRef.current = total;
             }
           } else {
@@ -196,7 +217,8 @@ export function useZekrSpeechRecognition({
             pendingTimerRef.current = setTimeout(() => {
               pendingTimerRef.current = null;
               if (total > confirmedCountRef.current) {
-                onMatch(total - confirmedCountRef.current);
+                const delta = total - confirmedCountRef.current;
+                commitMatch(delta);
                 confirmedCountRef.current = total;
               }
             }, CONFIRM_DELAY_MS);
@@ -242,6 +264,6 @@ export function useZekrSpeechRecognition({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, locale]);
 
-  // lastHeard/lastConfidence are TEMPORARY — for diagnosing the Android issue.
+  // lastHeard/lastConfidence are TEMPORARY — for diagnosing counting issues.
   return { isSupported, error, stop, lastHeard, lastConfidence };
 }
