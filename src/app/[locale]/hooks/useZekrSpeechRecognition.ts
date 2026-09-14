@@ -76,7 +76,7 @@ const MAX_RESTART_DELAY_MS = 3000;
 // Capping how much a single segment can add protects against that glitch
 // without needing to know its exact cause, while still allowing genuine
 // back-to-back repetitions (up to this limit) to count correctly.
-const MAX_MATCHES_PER_SEGMENT = 5;
+const MAX_MATCHES_PER_SEGMENT = 33;
 
 export function useZekrSpeechRecognition({
   targetPhrase,
