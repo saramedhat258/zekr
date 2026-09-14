@@ -6,9 +6,13 @@ import { useEffect, useRef, useState, useCallback } from "react";
  * TypeScript's lib.dom doesn't ship these yet, and support is
  * currently Chrome/Edge/Safari (desktop + Android). No support in Firefox.
  */
+interface SpeechRecognitionAlternativeLike {
+  transcript: string;
+  confidence: number;
+}
 interface SpeechRecognitionResultLike {
   isFinal: boolean;
-  [index: number]: { transcript: string };
+  [index: number]: SpeechRecognitionAlternativeLike;
 }
 interface SpeechRecognitionEventLike extends Event {
   resultIndex: number;
@@ -77,6 +81,15 @@ const MAX_RESTART_DELAY_MS = 3000;
 // correction arrives before this timer fires and the false match is never
 // counted.
 const CONFIRM_DELAY_MS = 150;
+// Minimum recognizer confidence (0–1) required to accept a result as a real
+// match. Distant background speech/noise (not the user's own voice) tends to
+// get a lower confidence score than clear, close-up speech, especially on
+// Chrome for Android which is more prone to picking up ambient sound than
+// desktop Chrome or Apple's on-device engine (Safari / any browser on iOS).
+// Not all browsers report a meaningful confidence value — when it's missing
+// or zero (undefined confidence, common on some engines), we don't punish
+// the user for that and treat it as acceptable rather than rejecting it.
+const MIN_CONFIDENCE = 0.55;
 
 export function useZekrSpeechRecognition({
   targetPhrase,
@@ -163,7 +176,22 @@ export function useZekrSpeechRecognition({
 
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const result = event.results[i];
-          const heard = normalizeArabic(result[0].transcript);
+          const alt = result[0];
+          // Some browsers don't report confidence at all (comes back as 0 by
+          // default even for a genuine, clear match) — only reject a result
+          // when we have a real, meaningfully low confidence value, not
+          // whenever it's simply absent/zero.
+          const hasMeaningfulConfidence =
+            typeof alt.confidence === "number" && alt.confidence > 0;
+          const passesConfidence = !hasMeaningfulConfidence || alt.confidence >= MIN_CONFIDENCE;
+
+          if (!passesConfidence) {
+            // Likely distant background speech/noise rather than the user's
+            // own voice — skip it entirely, don't fold it into the transcript.
+            continue;
+          }
+
+          const heard = normalizeArabic(alt.transcript);
 
           if (result.isFinal) {
             // Fold this segment permanently into the finalized transcript,
