@@ -41,20 +41,17 @@ declare global {
   }
 }
 
-// Removes Arabic diacritics (tashkeel) and unifies common letter variants
-// so that spoken text matches the reference dhikr text more reliably.
 function normalizeArabic(text: string): string {
   return text
-    .replace(/[\u064B-\u0652\u0670\u0640]/g, "") // tashkeel + tatweel
+    .replace(/[\u064B-\u0652\u0670\u0640]/g, "")
     .replace(/[إأآا]/g, "ا")
     .replace(/ى/g, "ي")
     .replace(/ة/g, "ه")
-    .replace(/[^\u0600-\u06FF\s]/g, "") // keep Arabic letters + spaces only
+    .replace(/[^\u0600-\u06FF\s]/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
 
-// Counts non-overlapping occurrences of `needle` inside `haystack`.
 function countOccurrences(haystack: string, needle: string): number {
   if (!needle) return 0;
   let count = 0;
@@ -67,28 +64,15 @@ function countOccurrences(haystack: string, needle: string): number {
 }
 
 type UseZekrSpeechRecognitionArgs = {
-  targetPhrase: string; // the dhikr's Arabic text to match against
-  active: boolean; // whether listening should currently be running
-  locale?: string; // "ar" locale code, defaults to ar-EG
-  onMatch: (times: number) => void; // called with how many repetitions were detected
+  targetPhrase: string;
+  active: boolean;
+  locale?: string;
+  onMatch: (times: number) => void;
 };
 
 const MIN_RESTART_DELAY_MS = 250;
 const MAX_RESTART_DELAY_MS = 3000;
-// How long we wait, after seeing a new match in the *interim* (not-yet-final)
-// tail of speech, before we actually count it. If the browser corrects
-// itself within this window (e.g. it briefly misheard a repeated word), the
-// correction arrives before this timer fires and the false match is never
-// counted.
 const CONFIRM_DELAY_MS = 150;
-// Minimum recognizer confidence (0–1) required to accept a result as a real
-// match. Distant background speech/noise (not the user's own voice) tends to
-// get a lower confidence score than clear, close-up speech, especially on
-// Chrome for Android which is more prone to picking up ambient sound than
-// desktop Chrome or Apple's on-device engine (Safari / any browser on iOS).
-// Not all browsers report a meaningful confidence value — when it's missing
-// or zero (undefined confidence, common on some engines), we don't punish
-// the user for that and treat it as acceptable rather than rejecting it.
 const MIN_CONFIDENCE = 0.55;
 
 export function useZekrSpeechRecognition({
@@ -99,15 +83,13 @@ export function useZekrSpeechRecognition({
 }: UseZekrSpeechRecognitionArgs) {
   const [isSupported, setIsSupported] = useState(true);
   const [error, setError] = useState<string>("");
+  // TEMPORARY DEBUG FIELDS — remove once the Android issue is diagnosed.
+  const [lastHeard, setLastHeard] = useState<string>("");
+  const [lastConfidence, setLastConfidence] = useState<number | null>(null);
+
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const targetRef = useRef(normalizeArabic(targetPhrase));
 
-  // --- Session-scoped counting state (reset every time listening (re)starts) ---
-  // All *finalized* speech so far, concatenated into one growing transcript.
-  // We track ONE running total across the whole session instead of tracking
-  // each recognizer "segment" (result index) separately — tracking segments
-  // independently is what caused the same utterance to sometimes get
-  // counted twice when the browser split fast speech into extra segments.
   const finalizedTextRef = useRef("");
   const confirmedCountRef = useRef(0);
   const pendingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -163,13 +145,9 @@ export function useZekrSpeechRecognition({
       const recognition = new SpeechRecognitionImpl();
       recognition.lang = locale;
       recognition.continuous = true;
-      // Interim results let us react to speech *as it's being said*,
-      // instead of waiting for the browser to decide the sentence is "final"
-      // (which only happens after a pause, causing a noticeable delay).
       recognition.interimResults = true;
 
       recognition.onresult = (event) => {
-        // Got real audio activity — the connection is healthy, so reset backoff.
         backoffRef.current = MIN_RESTART_DELAY_MS;
 
         let interimText = "";
@@ -177,26 +155,26 @@ export function useZekrSpeechRecognition({
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const result = event.results[i];
           const alt = result[0];
-          // Some browsers don't report confidence at all (comes back as 0 by
-          // default even for a genuine, clear match) — only reject a result
-          // when we have a real, meaningfully low confidence value, not
-          // whenever it's simply absent/zero.
+
+          // TEMPORARY DEBUG — show exactly what the engine heard + its
+          // confidence, live on screen, regardless of whether it passes
+          // the filter below.
+          setLastHeard(alt.transcript);
+          setLastConfidence(
+            typeof alt.confidence === "number" ? alt.confidence : null
+          );
+
           const hasMeaningfulConfidence =
             typeof alt.confidence === "number" && alt.confidence > 0;
           const passesConfidence = !hasMeaningfulConfidence || alt.confidence >= MIN_CONFIDENCE;
 
           if (!passesConfidence) {
-            // Likely distant background speech/noise rather than the user's
-            // own voice — skip it entirely, don't fold it into the transcript.
             continue;
           }
 
           const heard = normalizeArabic(alt.transcript);
 
           if (result.isFinal) {
-            // Fold this segment permanently into the finalized transcript,
-            // and evaluate the running total immediately — final segments
-            // won't be revised, so there's nothing to wait for.
             finalizedTextRef.current = `${finalizedTextRef.current} ${heard}`.trim();
             clearPendingTimer();
             const total = countOccurrences(finalizedTextRef.current, targetRef.current);
@@ -205,9 +183,6 @@ export function useZekrSpeechRecognition({
               confirmedCountRef.current = total;
             }
           } else {
-            // Only the most recent result can still be "in progress" —
-            // keep its text separately so it doesn't get folded into the
-            // permanent transcript until the browser finalizes it.
             interimText = heard;
           }
         }
@@ -231,19 +206,13 @@ export function useZekrSpeechRecognition({
 
       recognition.onerror = (event) => {
         const code = event.error;
-        // "no-speech" fires often during natural pauses between dhikr
-        // repetitions — it's not a real problem, so don't show an error,
-        // just let onend restart listening quietly.
         if (code === "no-speech" || code === "aborted") return;
         setError(code || "microphone-error");
       };
 
       recognition.onend = () => {
         if (stopped) return;
-        if (recognitionRef.current !== recognition) return; // superseded already
-        // Some browsers reject an immediate restart. Waiting a small,
-        // increasing delay avoids the silent failure that used to happen
-        // when start() was called too soon after stop().
+        if (recognitionRef.current !== recognition) return;
         restartTimerRef.current = setTimeout(() => {
           backoffRef.current = Math.min(backoffRef.current * 1.5, MAX_RESTART_DELAY_MS);
           createAndStart();
@@ -273,5 +242,6 @@ export function useZekrSpeechRecognition({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, locale]);
 
-  return { isSupported, error, stop };
+  // lastHeard/lastConfidence are TEMPORARY — for diagnosing the Android issue.
+  return { isSupported, error, stop, lastHeard, lastConfidence };
 }

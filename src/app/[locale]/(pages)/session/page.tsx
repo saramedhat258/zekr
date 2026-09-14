@@ -67,8 +67,8 @@ function Session() {
     };
 
     // Voice counting: while btnState === "started" and online, listen to mic
-    const { isSupported: speechSupported, error: speechError } = useZekrSpeechRecognition({
-        targetPhrase: zekrobj?.arabic || "",
+        const { isSupported: speechSupported, error: speechError, lastHeard, lastConfidence } = useZekrSpeechRecognition
+    ({        targetPhrase: zekrobj?.arabic || "",
         active: btnState === "started" && (count === Infinity || start < count) && !isOffline,
         locale: "ar-EG",
         onMatch: (times) => {
@@ -87,6 +87,15 @@ function Session() {
                     <Image src={btnState === "started" ? "/images/audio-wave.svg" : "/images/micgray.svg"} alt="mic" width={15} height={15} />
                     {btnState === "started" ? <p>{t("listeningNow")}</p> : <p>{t("listeningReady")}</p>}
                 </div>
+
+                {/* TEMPORARY DEBUG LINE — shows exactly what the mic heard and how
+                    confident the browser was, to diagnose the Android false-count
+                    issue. Remove this <p> once the issue is fixed. */}
+                {btnState === "started" && (
+                    <p className='text-center text-xs text-gray-400 mt-1 break-words px-4' dir="ltr">
+                        {lastHeard || "..."} — {lastConfidence !== null ? lastConfidence.toFixed(2) : "N/A"}
+                    </p>
+                )}
 
                 {isOffline && (
                     <p className='text-center text-sm mb-5 text-amber-800 bg-amber-50 border border-amber-200 p-2.5 rounded-xl max-w-md m-auto mt-3 font-medium'>
