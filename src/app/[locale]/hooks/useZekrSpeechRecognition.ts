@@ -48,6 +48,18 @@ function normalizeArabic(text: string): string {
     .trim();
 }
 
+// Counts non-overlapping occurrences of `needle` inside `haystack`.
+function countOccurrences(haystack: string, needle: string): number {
+  if (!needle) return 0;
+  let count = 0;
+  let pos = 0;
+  while ((pos = haystack.indexOf(needle, pos)) !== -1) {
+    count++;
+    pos += needle.length;
+  }
+  return count;
+}
+
 type UseZekrSpeechRecognitionArgs = {
   targetPhrase: string;
   active: boolean;
@@ -57,6 +69,14 @@ type UseZekrSpeechRecognitionArgs = {
 
 const MIN_RESTART_DELAY_MS = 250;
 const MAX_RESTART_DELAY_MS = 3000;
+// A single finalized speech segment realistically shouldn't contain more
+// than a handful of repetitions said in one breath. Chrome occasionally has
+// a bug where a "final" result comes back with the phrase duplicated
+// internally (e.g. reporting 16 matches when the user only said it 3 times).
+// Capping how much a single segment can add protects against that glitch
+// without needing to know its exact cause, while still allowing genuine
+// back-to-back repetitions (up to this limit) to count correctly.
+const MAX_MATCHES_PER_SEGMENT = 5;
 
 export function useZekrSpeechRecognition({
   targetPhrase,
@@ -108,11 +128,9 @@ export function useZekrSpeechRecognition({
       const recognition = new SpeechRecognitionImpl();
       recognition.lang = locale;
       recognition.continuous = true;
-      // We no longer need interim results — we only ever count a *finalized*
-      // segment, and only once per segment, no matter how many times the
-      // phrase appears inside it. This avoids a known browser quirk where a
-      // final transcript can come back with the phrase duplicated internally
-      // (reporting far more repetitions than were actually said).
+      // We only ever act on *finalized* segments — no interim results — to
+      // avoid the earlier bug where an interim match and its later final
+      // confirmation could both fire and stack on top of each other.
       recognition.interimResults = false;
 
       recognition.onresult = (event) => {
@@ -123,10 +141,9 @@ export function useZekrSpeechRecognition({
           if (!result.isFinal) continue;
 
           const heard = normalizeArabic(result[0].transcript);
-          if (targetRef.current && heard.includes(targetRef.current)) {
-            // Exactly one match per finalized segment — regardless of how
-            // many times the phrase might appear to occur in the text.
-            onMatch(1);
+          const occurrences = countOccurrences(heard, targetRef.current);
+          if (occurrences > 0) {
+            onMatch(Math.min(occurrences, MAX_MATCHES_PER_SEGMENT));
           }
         }
       };
