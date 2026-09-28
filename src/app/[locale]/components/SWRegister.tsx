@@ -8,33 +8,28 @@ export default function SWRegister() {
 
     navigator.serviceWorker
       .register("/sw.js")
-      .then(async (reg) => {
+      .then((reg) => {
         console.log("SW registered:", reg.scope);
 
-        // After the SW activates, warm the cache by fetching the main pages.
-        // The SW's fetch handler will intercept and cache every _next/ chunk
-        // that the server returns, ensuring offline-first works next time.
-        const warmCache = async () => {
-          const pages = ["/ar/home", "/en/home"];
-          await Promise.allSettled(
+        // When online: warm the cache proactively after the SW activates.
+        // This ensures the next offline visit has HTML pages cached too.
+        const warmCache = () => {
+          if (!navigator.onLine) return; // don't bother if already offline
+          const pages = ["/ar/home", "/en/home", "/ar", "/en", "/ar/session", "/en/session"];
+          Promise.allSettled(
             pages.map((page) =>
-              fetch(page, { credentials: "same-origin", cache: "no-cache" })
-                .catch(() => {})
+              fetch(page, { credentials: "same-origin", cache: "no-cache" }).catch(() => {})
             )
           );
         };
 
         if (reg.active) {
-          // SW already active (returning visit) — warm quietly
           warmCache();
         } else {
-          // First install — wait for it to activate then warm
-          const newWorker = reg.installing || reg.waiting;
-          if (newWorker) {
-            newWorker.addEventListener("statechange", () => {
-              if (newWorker.state === "activated") {
-                warmCache();
-              }
+          const worker = reg.installing || reg.waiting;
+          if (worker) {
+            worker.addEventListener("statechange", () => {
+              if (worker.state === "activated") warmCache();
             });
           }
         }
