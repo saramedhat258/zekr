@@ -1,36 +1,107 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🤲 Dhikr (Zekr)
 
-## Getting Started
+**A voice-powered Islamic dhikr counter that listens and counts automatically.**
 
-First, run the development server:
+> Say it. It counts.
+
+---
+
+## 💡 The Idea
+
+Most dhikr apps require you to tap a button every time you say a remembrance. This breaks your focus and interrupts the flow of worship.
+
+**Dhikr** lets you recite naturally while the app listens, recognizes your dhikr, and counts for you.
+
+✅ No tapping  
+✅ No interruptions  
+✅ Just you and your worship
+
+---
+
+## ✨ How It Works
+
+### 1️⃣ Choose Your Dhikr
+
+| Arabic | Transliteration | Meaning |
+|---------|----------------|----------|
+| اللَّهُ أَكْبَر | Allahu Akbar | Allah is the Greatest |
+| الْحَمْدُ لِلَّهِ | Alhamdulillah | All praise is due to Allah |
+| سُبْحَانَ اللَّهِ | Subhan Allah | Glory be to Allah |
+| أَسْتَغْفِرُ اللَّه | Astaghfirullah | I seek forgiveness from Allah |
+| لَا إِلَهَ إِلَّا اللَّه | La ilaha illallah | There is no god but Allah |
+| سُبْحَانَ اللَّهِ وَبِحَمْدِهِ | Subhanallahi wa bihamdihi | Glory and praise be to Allah |
+
+### 2️⃣ Set Your Target
+
+33 · 99 · 100 · 500 · Unlimited · or any custom number.
+
+### 3️⃣ Choose Your Completion Sound
+
+Pick the sound played when you reach your target (4 sounds available, with preview).
+
+### 4️⃣ Start Reciting
+
+Allow microphone access and recite. The counter updates automatically as it recognizes your dhikr. You can pause, restart, or change the dhikr at any time.
+
+---
+
+## 📱 Features
+
+- 🎙️ Automatic voice counting (Arabic speech recognition)
+- 👆 Manual tap-to-count fallback — used when the browser doesn't support speech recognition, the mic is blocked, or you're offline
+- 🌐 Arabic and English interface
+- 📲 Installable as a PWA (home screen on Android / iOS), with offline support for manual counting
+- 🔔 Completion sound with preview
+
+---
+
+## 🔒 Privacy
+
+- The app **does not record, store, or upload** your audio, and has no backend or database.
+- Speech recognition is performed by your **browser's built-in speech service** (the Web Speech API). Depending on the browser, this service may send audio to the browser vendor (e.g. Google for Chrome, Apple for Safari) for processing, which is why voice counting needs an internet connection.
+- If you prefer not to use it, you can count by tapping and never grant microphone access.
+
+---
+
+## 🌐 Browser Support
+
+| Browser | Voice counting | Manual counting |
+|---------|:---:|:---:|
+| Chrome / Edge (desktop + Android) | ✅ | ✅ |
+| Safari (macOS + iOS) | ✅ | ✅ |
+| Firefox | ❌ | ✅ |
+
+---
+
+## 🛠️ Tech Stack
+
+- [Next.js](https://nextjs.org) 16 (App Router) + React 19 + TypeScript
+- Tailwind CSS 4
+- [next-intl](https://next-intl.dev) for Arabic / English localization
+- Web Speech API for recognition (`useZekrSpeechRecognition` hook)
+- Service worker + web manifest (PWA)
+- Deployed on Vercel
+
+### Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev     # http://localhost:3000
+npm run build   # production build + service worker generation
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 👩‍💻 Team
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Role | Member |
+|--------|--------|
+| 🤖 AI | Sohila |
+| 💻 Website | Sara |
+| 🎨 UI & Design | Maryam |
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🎯 Vision
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+To create a distraction-free dhikr experience that allows Muslims to focus on remembrance while technology quietly handles the counting.
