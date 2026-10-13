@@ -5,6 +5,11 @@
 > Say it. It counts.
 
 ---
+## 🌐 Live Demo
+
+https://zekr-sigma.vercel.app
+
+---
 
 ## 💡 The Idea
 
@@ -97,7 +102,7 @@ npm run build   # production build + service worker generation
 | Role | Member |
 |--------|--------|
 | 🤖 AI | Sohila |
-| 💻 Website | Sara |
+| 💻 Website + PWA | Sara |
 | 🎨 UI & Design | Maryam |
 
 ---
