@@ -130,7 +130,7 @@ function CounterCircle({ start, count, setStart, setBtnState, isoffline }: prop)
                     )}
                 </div>
             </div>
-            <div className='cursor-pointer' onClick={(e) => {
+            <div className='cursor-pointer w-fit' onClick={(e) => {
                 e.stopPropagation();
                 setBtnState("");
                 setStart(0);
