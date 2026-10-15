@@ -83,10 +83,12 @@ function Session() {
     return (
         <div>
             <div className='mt-5' onClick={increase}>
-                <div className='w-fit m-auto flex gap-2 px-5 p-2 font-light rounded-3xl text-[#786F59] bg-[#FAF4E3]'>
-                    <Image src={btnState === "started" ? "/images/audio-wave.svg" : "/images/micgray.svg"} alt="mic" width={15} height={15} />
-                    {btnState === "started" ? <p>{t("listeningNow")}</p> : <p>{t("listeningReady")}</p>}
-                </div>
+                {!isOffline && (
+                    <div className='w-fit m-auto flex gap-2 px-5 p-2 font-light rounded-3xl text-[#786F59] bg-[#FAF4E3]'>
+                        <Image src={btnState === "started" ? "/images/audio-wave.svg" : "/images/micgray.svg"} alt="mic" width={15} height={15} />
+                        {btnState === "started" ? <p>{t("listeningNow")}</p> : <p>{t("listeningReady")}</p>}
+                    </div>
+                )}
 
                 {isOffline && (
                     <p className='text-center text-sm mb-5 text-amber-800 bg-amber-50 border border-amber-200 p-2.5 rounded-xl max-w-md m-auto mt-3 font-medium'>
@@ -110,13 +112,16 @@ function Session() {
             </div>
             {/* buttons /////////////////////////////////////////////////////////////////////////////////////////////// */}
             <div className='flex flex-col md:flex-row sm:gap-5 gap-2 lg:w-1/2 sm:w-3/4 m-auto'>
-                {btnState === "started" && start !== count ?
-                    <Btn src='/images/pause.svg' alt='pause' text={t("pauseSession")} onClick={() => setBtnState("start")} />
-                    : start === count ?
-                        <Btn src="/images/play.svg" alt='play' text={t("restartSession")} onClick={() => setStart(0)} />
-                        :
-                        <Btn src="/images/mic2.svg" alt='mic' text={t("startSession")} onClick={() => setBtnState("started")} />
-                }
+                {isOffline ? (
+                    start === count && <Btn src="/images/play.svg" alt='play' text={t("restartSession")} onClick={() => setStart(0)} />
+                ) : (
+                    btnState === "started" && start !== count ?
+                        <Btn src='/images/pause.svg' alt='pause' text={t("pauseSession")} onClick={() => setBtnState("start")} />
+                        : start === count ?
+                            <Btn src="/images/play.svg" alt='play' text={t("restartSession")} onClick={() => setStart(0)} />
+                            :
+                            <Btn src="/images/mic2.svg" alt='mic' text={t("startSession")} onClick={() => setBtnState("started")} />
+                )}
                 <Btn src="/images/change.svg" alt='change' text={t("changeZekr")} onClick={() => router.back()} style='border border-dark-green text-dark-green' />
             </div>
 
